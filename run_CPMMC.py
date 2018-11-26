@@ -22,6 +22,7 @@ def main(path):
 
     # binary clustering
     binary = [0, 1]
+    binary = [0, 1]
 
     # for toy dataset max index is 9 min index is 0
     data, label, bs, dim = toy_loader(path)

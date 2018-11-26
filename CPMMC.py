@@ -8,6 +8,7 @@ class CPMMC(object):
         self.data = kwargs['training_data']
         self.ann = kwargs['anns']
 
+
         self.bs = self.data.shape[0]
         self.dim = self.data.shape[1]
 
