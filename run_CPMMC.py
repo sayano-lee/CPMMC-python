@@ -1,5 +1,7 @@
 import numpy as np
+
 from utils import convert_strings_into_integers, define_binary_label
+from CPMMC import CPMMC
 
 
 def toy_loader(path):
@@ -36,3 +38,9 @@ def main(path):
 if __name__ == '__main__':
     PATH = './optdigits.txt'
     data, label = main(path=PATH)
+    mmc = CPMMC(training_data=data, anns=label,
+                C=0.01, epsilon=10, l=10,
+                b_0=0, xi_0=0.5)
+    foo = mmc()
+
+
