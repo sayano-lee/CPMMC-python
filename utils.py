@@ -1,8 +1,10 @@
 import numpy as np
 
+
 ## FIX ME: USED ONLY FOR TOY DATAS
 def convert_string_into_integer(line):
     return list(map(int, line.strip('\n').split(',')))
+
 
 def convert_strings_into_integers(data):
     lines = []
