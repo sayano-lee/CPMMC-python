@@ -16,13 +16,12 @@ def toy_loader(path):
     dim = T_data.shape[0]
 
     # [:-1] in T_data for removing label dimension
-    return T_data.transpose()[:-1], label, bs, dim
+    return T_data.transpose()[:,:-1], label, bs, dim
 
 def main(path):
 
     # binary clustering
-    binary = [0, 1]
-    binary = [0, 1]
+    binary = [1, 7]
 
     # for toy dataset max index is 9 min index is 0
     data, label, bs, dim = toy_loader(path)
@@ -39,9 +38,10 @@ def main(path):
 if __name__ == '__main__':
     PATH = './optdigits.txt'
     data, label = main(path=PATH)
-    mmc = CPMMC(training_data=data, anns=label,
+    MMC = CPMMC(data=data, anns=label,
                 C=0.01, epsilon=10, l=10,
                 b_0=0, xi_0=0.5)
-    foo = mmc()
+
+    foo = MMC()
 
 
