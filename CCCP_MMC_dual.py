@@ -1,4 +1,6 @@
 import numpy as np
+# import quadprog as qp
+from cvxopt import solvers
 
 def CCCP_MMC_dual(**kwargs):
 
@@ -45,14 +47,18 @@ def CCCP_MMC_dual(**kwargs):
         HQP = x_mat.transpose().dot(x_mat)
         fQP = [-c_k, l, l]
 
-        import ipdb
-        ipdb.set_trace()
-        inter = np.ones((1, constraint_dim))
-        AQP = np.append((inter, [0, 0]), axis=0)
+        suffix = np.array([[0, 0]])    #shape (1,2)
+        AQP = np.append(np.ones((1, constraint_dim)), suffix, axis=1)    #shape (1, c_dim+2)
         bQP = C
 
         Aeq = [-s_k.transpose(), data_dim, -data_dim]
         beq = 0
 
+        # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
         import ipdb
         ipdb.set_trace()
+
+        solved = solvers.qp(HQP, fQP, AQP, bQP, Aeq, beq)
+        #solved = solvers.qp(HQP, fQP)
+
+
