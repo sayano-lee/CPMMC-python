@@ -38,9 +38,18 @@ def main(path):
 if __name__ == '__main__':
     PATH = './optdigits.txt'
     data, label = main(path=PATH)
+
+    #convert into (1, 1) numpy array for further deployment
+    C = np.array([[0.01]])
+    l = np.array([[10]])
+    b_0 = np.array([[0]])
+    xi_0 = np.array([[0.5]])
+
+    epsilon = 10
+
     MMC = CPMMC(data=data, anns=label,
-                C=0.01, epsilon=10, l=10,
-                b_0=0, xi_0=0.5)
+                C=C, epsilon=epsilon, l=l,
+                b_0=b_0, xi_0=xi_0)
 
     foo = MMC()
 
