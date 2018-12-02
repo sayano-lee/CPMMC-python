@@ -3,6 +3,8 @@ import numpy as np
 from cvxopt import solvers, matrix
 import quadprog
 
+from solver_wrapper import solve_qp
+
 def CCCP_MMC_dual(**kwargs):
 
     omega_0 = kwargs['omega_0']
@@ -46,7 +48,7 @@ def CCCP_MMC_dual(**kwargs):
         # ipdb.set_trace()
         x_mat = np.concatenate((z_k, -x_k, x_k), axis=1)
         HQP = x_mat.transpose().dot(x_mat)
-        HQP = np.array([[1.0,2.0,3.0],[2.0,5.0,8.0],[3.0,8.0,9.0]])
+        # HQP = np.array([[1.0,2.0,3.0],[2.0,5.0,8.0],[3.0,8.0,9.0]])
         # fQP = [-c_k, l, l]
         fQP = np.concatenate((-c_k, l, l), axis=0)
 
@@ -60,17 +62,19 @@ def CCCP_MMC_dual(**kwargs):
         Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr),axis=1)
         beq = np.array([[0]], dtype=float)
 
-        # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
 
+
+        # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
 
         argus = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
 
-        #solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq)
-        # import ipdb
-        # ipdb.set_trace()
         # solved = solvers.qp(*arguments)
-        solved = solvers.qp(argus[0], argus[1], argus[2], argus[3], argus[4], argus[5])
-        # solved = quadprog.solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
+        import ipdb
+        ipdb.set_trace()
+
+        solved = solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
+
+        solved = quadprog.solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
         #solved = solvers.qp(P=HQP, q=fQP)
 
 
