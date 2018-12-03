@@ -62,19 +62,24 @@ def CCCP_MMC_dual(**kwargs):
         Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr),axis=1)
         beq = np.array([[0]], dtype=float)
 
+        LB = np.zeros(constraint_dim+2)
+        UB = float('inf')*np.ones(constraint_dim+2)
+
 
 
         # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
 
-        argus = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
+        HQP, fQP, AQP, bQP, Aeq, beq = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
 
         # solved = solvers.qp(*arguments)
-        import ipdb
-        ipdb.set_trace()
+        # import ipdb
+        # ipdb.set_trace()
 
-        solved = solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
+        #solved = solve_qp(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB)
+        solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq, kktsolver='ldl',
+                            options={'kktreg':1e-9})
 
-        solved = quadprog.solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
+        # solved = quadprog.solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
         #solved = solvers.qp(P=HQP, q=fQP)
 
 

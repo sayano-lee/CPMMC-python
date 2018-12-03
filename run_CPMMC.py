@@ -11,7 +11,10 @@ def toy_loader(path):
     T_data = convert_strings_into_integers(data).transpose()
     label = T_data[-1]
 
-    bs = T_data.shape[1]
+    # import ipdb
+    # ipdb.set_trace()
+
+    bs = T_data.shape[1] - 1
     # assuming all points have same dims
     dim = T_data.shape[0]
 
