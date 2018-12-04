@@ -48,6 +48,8 @@ def CCCP_MMC_dual(**kwargs):
         # ipdb.set_trace()
         x_mat = np.concatenate((z_k, -x_k, x_k), axis=1)
         HQP = x_mat.transpose().dot(x_mat)
+        import ipdb
+        ipdb.set_trace()
         # HQP = np.array([[1.0,2.0,3.0],[2.0,5.0,8.0],[3.0,8.0,9.0]])
         # HQP = np.array([[1.0,0.0,0.0],[0.0,5.0,0.0],[0.0,0.0,0.0]])
 
