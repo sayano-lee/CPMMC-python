@@ -5,6 +5,8 @@ import quadprog
 
 from solver_wrapper import solve_qp
 
+from utils import find
+
 def CCCP_MMC_dual(**kwargs):
 
     omega_0 = kwargs['omega_0']
@@ -44,16 +46,9 @@ def CCCP_MMC_dual(**kwargs):
         s_k = W.dot(tmp_s_k) / data_dim
         z_k = tmp_z_k.dot(W.transpose()) / data_dim
 
-        # import ipdb
-        # ipdb.set_trace()
         x_mat = np.concatenate((z_k, -x_k, x_k), axis=1)
         HQP = x_mat.transpose().dot(x_mat)
-        # import ipdb
-        # ipdb.set_trace()
-        # HQP = np.array([[1.0,2.0,3.0],[2.0,5.0,8.0],[3.0,8.0,9.0]])
-        # HQP = np.array([[1.0,0.0,0.0],[0.0,5.0,0.0],[0.0,0.0,0.0]])
 
-        # fQP = [-c_k, l, l]
         fQP = np.concatenate((-c_k, l, l), axis=0)
 
         suffix = np.array([[0, 0]])    #shape (1,2)
@@ -66,25 +61,33 @@ def CCCP_MMC_dual(**kwargs):
         Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr),axis=1)
         beq = np.array([[0]], dtype=float)
 
+        # to be omitted
         LB = np.zeros(constraint_dim+2)
         UB = float('inf')*np.ones(constraint_dim+2)
-
-
 
         # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
 
         HQP, fQP, AQP, bQP, Aeq, beq = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
+        args = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
 
-        # solved = solvers.qp(*arguments)
-        # import ipdb
-        # ipdb.set_trace()
+        opts = {'kktreg':1e-10,
+                'show_progress':False}
 
-        #solved = solve_qp(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB)
-        solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq, kktsolver='ldl',
-                            options={'kktreg':1e-9})
-        #solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq, kktsolver='ldl')
+        # solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq, kktsolver='ldl',
+                            # options=opts)
+        
+        solved = solvers.qp(*args, kktsolver='ldl', options=opts)
+        
+        XQP = solved['x']
+        f_val = solved['primal objective']
 
-        # solved = quadprog.solve_qp(HQP, fQP, AQP, bQP, Aeq, beq)
-        #solved = solvers.qp(P=HQP, q=fQP)
+        omega_old = x_mat.dot(XQP)
+        xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
+
+
+
+        import ipdb
+        ipdb.set_trace()
+
 
 

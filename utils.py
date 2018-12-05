@@ -14,3 +14,7 @@ def define_binary_label(label, idx):
     indices1 = np.where(label == idx[0])
     indices2 = np.where(label == idx[1])
     return indices1[0], indices2[0]
+
+# matlab-style find
+def find(src, func):
+    return [idx for (idx, data) in enumerate(src) if func(data)]
