@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import array as na
 # import quadprog as qp
 from cvxopt import solvers, matrix
 import quadprog
@@ -20,11 +21,13 @@ def CCCP_MMC_dual(**kwargs):
     constraint_dim, data_dim = W.shape[0], W.shape[1]
     dim, tmp = omega_0.shape[0], omega_0.shape[1]
 
-    # omega_old = omega_0
-    # b_old = b_0
-    # xi_old = xi
+    omega_old = omega_0
+    b_old = b_0
+    xi_old = xi_0
+    f_val_old = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
 
-    f_val = 0.5 * omega_0.transpose() * omega_0 + C * xi_0
+
+    f_val = 0.5 * omega_0.transpose() * omega_0 + C * xi_old
 
     continue_flag = True
     per_quit = 0.01
@@ -49,6 +52,10 @@ def CCCP_MMC_dual(**kwargs):
         x_mat = np.concatenate((z_k, -x_k, x_k), axis=1)
         HQP = x_mat.transpose().dot(x_mat)
 
+        # HQP = np.array([[1.0,2.0,4.0],[2.0,6.0,12.0],[4.0,12.0,24.0]])
+        # import ipdb
+        # ipdb.set_trace()
+
         fQP = np.concatenate((-c_k, l, l), axis=0)
 
         suffix = np.array([[0, 0]])    #shape (1,2)
@@ -67,7 +74,7 @@ def CCCP_MMC_dual(**kwargs):
 
         # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
 
-        HQP, fQP, AQP, bQP, Aeq, beq = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
+        # HQP, fQP, AQP, bQP, Aeq, beq = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
         args = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
 
         opts = {'kktreg':1e-10,
@@ -77,14 +84,27 @@ def CCCP_MMC_dual(**kwargs):
                             # options=opts)
         
         solved = solvers.qp(*args, kktsolver='ldl', options=opts)
-        
+
         XQP = solved['x']
         f_val = solved['primal objective']
 
         omega_old = x_mat.dot(XQP)
         xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
+        sv_index = find(XQP[0:constraint_dim], lambda x:x>0)
+        b_old = (c_k[sv_index[0]] - xi_old - omega_old.transpose() \
+                .dot(z_k[:,sv_index[0]]))/s_k[sv_index[0]]
+
+        f_val = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
+
+        if ((f_val_old - f_val) >= 0) and ((f_val_old - f_val) < (per_quit * f_val_old)):
+            continue_flag = False
+        else:
+            f_val_old = f_val
 
 
+        omega = omega_old
+        b = b_old
+        xi = xi_old
 
         import ipdb
         ipdb.set_trace()
