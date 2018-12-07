@@ -72,18 +72,14 @@ def CCCP_MMC_dual(**kwargs):
         LB = np.zeros(constraint_dim+2)
         UB = float('inf')*np.ones(constraint_dim+2)
 
-        # [XQP, fVal, exitFlag] = quadprog(HQP, fQP, AQP, bQP, Aeq, beq, LB, UB, [], ops)
-
-        # HQP, fQP, AQP, bQP, Aeq, beq = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
-        args = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
+        np_args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
+        args = [matrix(i) for i in np_args]
 
         opts = {'kktreg':1e-10,
                 'show_progress':False}
 
-        # solved = solvers.qp(P=HQP, q=fQP, G=AQP, h=bQP, A=Aeq, b=beq, kktsolver='ldl',
-                            # options=opts)
-        
-        solved = solvers.qp(*args, kktsolver='ldl', options=opts)
+        #solved = solvers.qp(*args, kktsolver='ldl', options=opts)
+        solved = solve_qp(*np_args)
 
         XQP = solved['x']
         f_val = solved['primal objective']
