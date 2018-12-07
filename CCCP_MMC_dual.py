@@ -68,9 +68,8 @@ def CCCP_MMC_dual(**kwargs):
         Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr),axis=1)
         beq = np.array([[0]], dtype=float)
 
-        # to be omitted
-        LB = np.zeros(constraint_dim+2)
-        UB = float('inf')*np.ones(constraint_dim+2)
+        LB = np.zeros((constraint_dim+2, 1))
+        UB = float('inf')*np.ones((constraint_dim+2, 1))
 
         np_args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
         args = [matrix(i) for i in np_args]
