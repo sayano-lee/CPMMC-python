@@ -72,16 +72,20 @@ def CCCP_MMC_dual(**kwargs):
         UB = float('inf')*np.ones((constraint_dim+2, 1))
 
         np_args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
-        args = [matrix(i) for i in np_args]
+        # args = [matrix(i) for i in np_args]
+        args = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
 
         opts = {'kktreg':1e-10,
                 'show_progress':False}
 
-        #solved = solvers.qp(*args, kktsolver='ldl', options=opts)
+        # solved = solvers.qp(*args, kktsolver='ldl', options=opts)
         solved = solve_qp(*np_args)
 
         XQP = solved['x']
         f_val = solved['primal objective']
+
+        import ipdb
+        ipdb.set_trace()
 
         omega_old = x_mat.dot(XQP)
         xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
