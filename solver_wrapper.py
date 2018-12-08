@@ -1,5 +1,6 @@
 from cvxopt import solvers, matrix
 import numpy as np
+from numpy import array as na
 
 def solve_qp(*args):
     """
@@ -35,6 +36,9 @@ def solve_qp(*args):
     opts = {'kktreg':1e-10,
             'show_progress':False}
 
+
+    # fake input
+    q = matrix(np.array([1.0,1.0,1.0]))
 
     solved = solvers.qp(P=P, q=q, G=G, h=h, A=A, b=b,
              kktsolver='ldl', options=opts)
