@@ -25,16 +25,19 @@ def solve_qp(*args):
 
     n = args[0].shape[0]
 
-    P = args[0]
-    q = args[1]
-    G = np.vstack([args[2], -np.eye(n), np.eye(n)])
-    h = np.vstack([args[3], args[6], args[7]])
-    A = args[4]
-    b = args[5]
+    P = matrix(args[0])
+    q = matrix(args[1])
+    G = matrix(np.vstack([args[2], -np.eye(n), np.eye(n)]))
+    h = matrix(np.vstack([args[3], args[6], args[7]]))
+    A = matrix(args[4])
+    b = matrix(args[5])
 
-    converted = map(matrix, [P, q, G, h, A, b])
+    opts = {'kktreg':1e-10,
+            'show_progress':False}
 
-    solved = solvers.qp(*converted)
+
+    solved = solvers.qp(P=P, q=q, G=G, h=h, A=A, b=b,
+             kktsolver='ldl', options=opts)
 
     import ipdb
     ipdb.set_trace()
