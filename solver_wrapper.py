@@ -40,11 +40,11 @@ def solve_qp(*args):
 
 
     # fake input
-    q = matrix(np.array([1.0,1.0,1.0]))
+    # q = matrix(np.array([1.0,1.0,1.0]))
 
     # solved = solvers.qp(P=P, q=q, G=G, h=h, A=A, b=b,
     #             kktsolver='ldl2', options=opts)
 
-    solved = solvers.qp(P=P, q=q, G=G, h=h, A=A, b=b, kktsolver='ldl')
+    solved = solvers.qp(P=P, q=q, G=G, h=h, A=A, b=b)
 
     return solved
