@@ -9,9 +9,9 @@ def solve_qp(*args):
     args: HQP(P), fQP(q), AQP(G), bQP(h), Aeq(A), beq(b), LB, UB
 
     minimize    (1/2)*x'*P*x + q'*x
-    subject to  G*x > h
+    subject to  G*x <= h
                 A*x = b
-                LB < x < UB
+                LB <= x <= UB
 
     dim: P  (n x n)
          q  (n x 1)
@@ -30,10 +30,11 @@ def solve_qp(*args):
     q = matrix(args[1])
     # G = matrix(np.vstack([args[2], np.eye(n), -np.eye(n)]))
     # h = matrix(np.vstack([args[3], args[6], -args[7]]))
-    G = matrix(np.vstack([args[2], np.eye(n)]))
+    G = matrix(np.vstack([args[2], -np.eye(n)]))
     h = matrix(np.vstack([args[3], args[6]]))
     A = matrix(args[4])
     b = matrix(args[5])
+
 
     opts = {'kktreg':1e-10,
             'show_progress':False}
