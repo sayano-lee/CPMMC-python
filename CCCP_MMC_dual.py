@@ -60,32 +60,25 @@ def CCCP_MMC_dual(**kwargs):
 
         suffix = np.array([[0, 0]])    #shape (1,2)
         prefix = np.ones((1, constraint_dim))
-        # AQP = np.append(np.ones((1, constraint_dim)), suffix, axis=0)    #shape (1, c_dim+2)
         AQP = np.concatenate((prefix, suffix), axis=1)    #shape (1, dim(prefix) + 2)
         bQP = C
 
         data_dim_arr = np.array([[data_dim]])
-        Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr),axis=1)
+        Aeq = np.concatenate((-s_k.transpose(), data_dim_arr, -data_dim_arr), axis=1)
         beq = np.array([[0]], dtype=float)
 
         LB = np.zeros((constraint_dim+2, 1))
         UB = float('inf')*np.ones((constraint_dim+2, 1))
 
-        np_args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
-        # args = [matrix(i) for i in np_args]
-        args = [matrix(i) for i in [HQP, fQP, AQP, bQP, Aeq, beq]]
+        # opts = {'kktreg': 1e-10,
+                # 'show_progress': False}
+        args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
 
-        opts = {'kktreg':1e-10,
-                'show_progress':False}
-
-        # solved = solvers.qp(*args, kktsolver='ldl', options=opts)
-        solved = solve_qp(*np_args)
+        solved = solve_qp(*args)
 
         XQP = solved['x']
         f_val = solved['primal objective']
 
-        import ipdb
-        ipdb.set_trace()
 
         omega_old = x_mat.dot(XQP)
         xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
@@ -100,13 +93,8 @@ def CCCP_MMC_dual(**kwargs):
         else:
             f_val_old = f_val
 
-
         omega = omega_old
         b = b_old
         xi = xi_old
 
-        import ipdb
-        ipdb.set_trace()
-
-
-
+        return omega, b, xi
