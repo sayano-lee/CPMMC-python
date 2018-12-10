@@ -35,18 +35,37 @@ class CPMMC(object):
                 constraint[i] = 1
             else:
                 constraint[i] = 0
-        # self.W = [self.W, constraint.transpose()]
+
         self.W = constraint.transpose()
 
         continue_flag = True
 
         while(continue_flag):
 
-            CCCP_MMC_dual(omega_0=self.omega_0, b_0=self.b_0,
-                          xi_0=self.xi_0, C=self.C,
-                          W=self.W, l=self.l,
-                          data=self.data)
+            omega, b, xi = CCCP_MMC_dual(omega_0=self.omega_0, b_0=self.b_0,
+                                         xi_0=self.xi_0, C=self.C,
+                                         W=self.W, l=self.l,
+                                         data=self.data)
 
+            constraint = np.zeros((self.dim, 1))
+            SumQuit = 0
+
+            for i in range(self.dim):
+                CountViolate = abs(omega.transpose().dot(self.data[i,:])+b)
+                if CountViolate<1:
+                    constraint[i] = 1
+                    SumQuit = SumQuit + constraint[i] - constraint[i] * CountViolate
+                else:
+                    constraint[i] = 0
+
+            SumQuit = SumQuit / self.dim
+
+            # end loop
+            if SumQuit <= xi * (1 + self.epsilon):
+                continue_flag = False
+            else:
+                import ipdb
+                ipdb.set_trace()
             import ipdb
             ipdb.set_trace()
 

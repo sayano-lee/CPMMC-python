@@ -1,8 +1,6 @@
 import numpy as np
 from numpy import array as na
-# import quadprog as qp
 from cvxopt import solvers, matrix
-import quadprog
 
 from solver_wrapper import solve_qp
 
@@ -25,7 +23,6 @@ def CCCP_MMC_dual(**kwargs):
     b_old = b_0
     xi_old = xi_0
     f_val_old = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
-
 
     f_val = 0.5 * omega_0.transpose() * omega_0 + C * xi_old
 
@@ -51,16 +48,11 @@ def CCCP_MMC_dual(**kwargs):
 
         x_mat = np.concatenate((z_k, -x_k, x_k), axis=1)
         HQP = x_mat.transpose().dot(x_mat)
-
-        # HQP = np.array([[1.0,2.0,4.0],[2.0,6.0,12.0],[4.0,12.0,24.0]])
-        # import ipdb
-        # ipdb.set_trace()
-
         fQP = np.concatenate((-c_k, l, l), axis=0)
 
-        suffix = np.array([[0, 0]])    #shape (1,2)
+        suffix = np.array([[0, 0]])
         prefix = np.ones((1, constraint_dim))
-        AQP = np.concatenate((prefix, suffix), axis=1)    #shape (1, dim(prefix) + 2)
+        AQP = np.concatenate((prefix, suffix), axis=1)
         bQP = C
 
         data_dim_arr = np.array([[data_dim]])
@@ -79,7 +71,6 @@ def CCCP_MMC_dual(**kwargs):
         XQP = solved['x']
         f_val = solved['primal objective']
 
-
         omega_old = x_mat.dot(XQP)
         xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
         sv_index = find(XQP[0:constraint_dim], lambda x:x>0)
@@ -88,13 +79,16 @@ def CCCP_MMC_dual(**kwargs):
 
         f_val = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
 
+        import ipdb
+        ipdb.set_trace()
         if ((f_val_old - f_val) >= 0) and ((f_val_old - f_val) < (per_quit * f_val_old)):
             continue_flag = False
         else:
             f_val_old = f_val
 
-        omega = omega_old
-        b = b_old
-        xi = xi_old
-
-        return omega, b, xi
+    omega = omega_old
+    b = b_old
+    xi = xi_old
+    import ipdb
+    ipdb.set_trace()
+    return omega, b, xi
