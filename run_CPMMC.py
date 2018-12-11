@@ -24,7 +24,7 @@ def toy_loader(path):
 def main(path):
 
     # binary clustering
-    binary = [1, 7]
+    binary = [2, 4]
 
     # for toy dataset max index is 9 min index is 0
     data, label, bs, dim = toy_loader(path)
@@ -34,8 +34,10 @@ def main(path):
     num_total_samples = len(defined_label1) + len(defined_label2)
     label = np.ones(num_total_samples, dtype='int64')
     label[len(defined_label2):-1] = -1
-
-    training_data = data[np.concatenate((defined_label1, defined_label2))]
+    index = np.concatenate((defined_label1, defined_label2))
+    # index.sort(axis=0)
+    # training_data = data[np.concatenate((defined_label1, defined_label2))]
+    training_data = data[index]
     return training_data, label
 
 if __name__ == '__main__':
@@ -54,6 +56,4 @@ if __name__ == '__main__':
                 C=C, epsilon=epsilon, l=l,
                 b_0=b_0, xi_0=xi_0)
 
-    foo = MMC()
-
-
+    acc = MMC()

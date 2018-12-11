@@ -26,11 +26,12 @@ class CPMMC(object):
     def __call__(self):
 
         constraint = np.zeros((self.bs, 1))
+
         for i in range(self.bs):
 
             intermediate = self.omega_0.transpose().dot(self.data[i,:][:,np.newaxis])
-
             CountViolate = abs(intermediate) + self.b_0
+
             if CountViolate < 1:
                 constraint[i] = 1
             else:
@@ -40,17 +41,20 @@ class CPMMC(object):
 
         continue_flag = True
 
+        cnt = 0
         while(continue_flag):
+
+            cnt += 1
 
             omega, b, xi = CCCP_MMC_dual(omega_0=self.omega_0, b_0=self.b_0,
                                          xi_0=self.xi_0, C=self.C,
                                          W=self.W, l=self.l,
                                          data=self.data)
 
-            constraint = np.zeros((self.dim, 1))
+            constraint = np.zeros((self.bs, 1))
             SumQuit = 0
 
-            for i in range(self.dim):
+            for i in range(self.bs):
                 CountViolate = abs(omega.transpose().dot(self.data[i,:])+b)
                 if CountViolate<1:
                     constraint[i] = 1
@@ -58,14 +62,25 @@ class CPMMC(object):
                 else:
                     constraint[i] = 0
 
-            SumQuit = SumQuit / self.dim
+            SumQuit = SumQuit / self.bs
 
-            # end loop
+            # when to end loop
             if SumQuit <= xi * (1 + self.epsilon):
                 continue_flag = False
+                print(cnt)
             else:
-                import ipdb
-                ipdb.set_trace()
-            import ipdb
-            ipdb.set_trace()
+                self.W = np.concatenate((self.W, constraint.transpose()), axis=0)
+                self.omega_0 = omega
+                self.b_0 = b
+                self.xi_0 = xi
+
+        count = 0
+        # predicted_label = np.sign(omega.transpose().dot(self.data.transpose()) + b)
+        predicted_label = np.sign(self.data.dot(omega) + b).astype('int')
+
+        for i in range(self.bs):
+            if predicted_label[i] == self.ann[i]:
+                count += 1
+
+        return float(count) / self.bs
 

@@ -30,17 +30,21 @@ def CCCP_MMC_dual(**kwargs):
     per_quit = 0.01
 
     # iter = 0
-    c_k = W.mean(axis=1)[np.newaxis,:]
+    c_k = W.mean(axis=1)[:,np.newaxis]
     # s_k = np.zeros((constraint_dim, 1))
     # z_k = np.zeros((dim, constraint_dim))
     x_k = np.sum(data, axis=1)[:,np.newaxis]
 
+    count = 0
     while(continue_flag):
+
+        count += 1
+
         tmp_z_k = np.zeros((dim, data_dim))
         tmp_s_k = np.zeros((data_dim, 1))
 
         for i in range(data_dim):
-            tmp_s_k[i] = np.sign(omega_0.transpose().dot(data[:,i][:,np.newaxis])+b_0)
+            tmp_s_k[i] = np.sign(omega_old.transpose().dot(data[:,i][:,np.newaxis])+b_old)
             tmp_z_k[:,i] = tmp_s_k[i] * data[:,i]
 
         s_k = W.dot(tmp_s_k) / data_dim
@@ -66,6 +70,7 @@ def CCCP_MMC_dual(**kwargs):
                 # 'show_progress': False}
         args = [HQP, fQP, AQP, bQP, Aeq, beq, LB, UB]
 
+        # solve qp problem
         solved = solve_qp(*args)
 
         XQP = solved['x']
@@ -79,8 +84,6 @@ def CCCP_MMC_dual(**kwargs):
 
         f_val = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
 
-        import ipdb
-        ipdb.set_trace()
         if ((f_val_old - f_val) >= 0) and ((f_val_old - f_val) < (per_quit * f_val_old)):
             continue_flag = False
         else:
@@ -89,6 +92,4 @@ def CCCP_MMC_dual(**kwargs):
     omega = omega_old
     b = b_old
     xi = xi_old
-    import ipdb
-    ipdb.set_trace()
     return omega, b, xi
