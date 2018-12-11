@@ -81,8 +81,5 @@ class CPMMC(object):
             if predicted_label[i] == self.ann[i]:
                 count += 1
 
-        import ipdb
-        ipdb.set_trace()
-
         return float(count) / self.bs
 
