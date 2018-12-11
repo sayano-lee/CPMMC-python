@@ -21,20 +21,31 @@ def toy_loader(path):
     # [:-1] in T_data for removing label dimension
     return T_data.transpose()[:,:-1], label, bs, dim
 
+
+def find_label_index(label1, label2):
+    label = np.ones(len(label1) + len(label2), dtype="int64")
+
+    index = np.concatenate((label1, label2))
+    index.sort()
+
+    # find index in label2, set to -1
+    for cnt, idx in enumerate(index):
+        if idx in label2:
+            label[cnt] = -1
+    return index, label
+
+
 def main(path):
 
     # binary clustering
-    binary = [2, 4]
+    binary = [2,8]
 
     # for toy dataset max index is 9 min index is 0
     data, label, bs, dim = toy_loader(path)
 
     # generate binary label
     defined_label1, defined_label2 = define_binary_label(label, binary)
-    num_total_samples = len(defined_label1) + len(defined_label2)
-    label = np.ones(num_total_samples, dtype='int64')
-    label[len(defined_label2):-1] = -1
-    index = np.concatenate((defined_label1, defined_label2))
+    index, label = find_label_index(defined_label1, defined_label2)
     # index.sort(axis=0)
     # training_data = data[np.concatenate((defined_label1, defined_label2))]
     training_data = data[index]
@@ -57,3 +68,4 @@ if __name__ == '__main__':
                 b_0=b_0, xi_0=xi_0)
 
     acc = MMC()
+    print("accuracy is {:.4f}".format(acc))

@@ -67,7 +67,6 @@ class CPMMC(object):
             # when to end loop
             if SumQuit <= xi * (1 + self.epsilon):
                 continue_flag = False
-                print(cnt)
             else:
                 self.W = np.concatenate((self.W, constraint.transpose()), axis=0)
                 self.omega_0 = omega
@@ -81,6 +80,9 @@ class CPMMC(object):
         for i in range(self.bs):
             if predicted_label[i] == self.ann[i]:
                 count += 1
+
+        import ipdb
+        ipdb.set_trace()
 
         return float(count) / self.bs
 
