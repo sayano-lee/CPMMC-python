@@ -54,6 +54,8 @@ def main(path):
 if __name__ == '__main__':
     PATH = './optdigits.txt'
     data, label = main(path=PATH)
+    import ipdb
+    ipdb.set_trace()
 
     #convert into (1, 1) numpy array for further deployment
     C = np.array([[0.01]])
