@@ -6,6 +6,12 @@ class CPMMC(object):
 
     def __init__(self, **kwargs):
 
+        """
+
+        C, l, omega_0 need to be fine tuned
+
+        """
+
         # self.data = kwargs['data']
         # self.ann = kwargs['anns']
 
@@ -19,7 +25,7 @@ class CPMMC(object):
         self.W = []
         self.l = kwargs['l']
 
-        self.omega_0 = 0.003 * np.ones((dim, 1))
+        self.omega_0 = 0.001 * np.ones((dim, 1))
         self.b_0 = 0
         self.xi_0 = 0.5
 

@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import array as na
 from cvxopt import solvers, matrix
 
 from solver_wrapper import solve_qp
@@ -81,7 +82,7 @@ def CCCP_MMC_dual(**kwargs):
         xi_old = (-f_val - 0.5*omega_old.transpose().dot(omega_old)) / C
         sv_index = find(XQP[0:constraint_dim], lambda x:x>0)
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+            warnings.simplefilter("error")
             b_old = (c_k[sv_index[0]] - xi_old - omega_old.transpose().dot(z_k[:,sv_index[0]]))/s_k[sv_index[0]]
 
         f_val = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
