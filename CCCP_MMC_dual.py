@@ -26,7 +26,7 @@ def CCCP_MMC_dual(**kwargs):
     xi_old = xi_0
     f_val_old = 0.5 * omega_old.transpose().dot(omega_old) + C * xi_old
 
-    f_val = 0.5 * omega_0.transpose() * omega_0 + C * xi_old
+    # f_val = 0.5 * omega_0.transpose() * omega_0 + C * xi_old
 
     continue_flag = True
     per_quit = 0.01

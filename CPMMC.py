@@ -10,6 +10,15 @@ class CPMMC(object):
 
         C, l, omega_0 need to be fine tuned
 
+        C ----> h
+        l ----> part of q
+        omega_0 ----> CountViolate line 52
+
+        minimize    (1/2)*x'*P*x + q'*x
+        subject to  G*x <= h
+                    A*x = b
+                    LB <= x <= UB
+
         """
 
         # self.data = kwargs['data']
@@ -25,7 +34,7 @@ class CPMMC(object):
         self.W = []
         self.l = kwargs['l']
 
-        self.omega_0 = 0.001 * np.ones((dim, 1))
+        self.omega_0 = kwargs['CountViolateCoef'] * np.ones((dim, 1))
         self.b_0 = 0
         self.xi_0 = 0.5
 
@@ -40,7 +49,7 @@ class CPMMC(object):
         for i in range(bs):
 
             intermediate = self.omega_0.transpose().dot(data[i,:][:,np.newaxis])
-            CountViolate = abs(intermediate) + self.b_0
+            CountViolate = abs(intermediate + self.b_0)
 
             if CountViolate < 1:
                 constraint[i] = 1
@@ -65,8 +74,9 @@ class CPMMC(object):
             SumQuit = 0
 
             for i in range(bs):
-                CountViolate = abs(omega.transpose().dot(data[i,:])+b)
-                if CountViolate<1:
+                intermediate = omega.transpose().dot(data[i,:][:,np.newaxis])
+                CountViolate = abs(intermediate + b)
+                if CountViolate < 1:
                     constraint[i] = 1
                     SumQuit = SumQuit + constraint[i] - constraint[i] * CountViolate
                 else:
@@ -86,10 +96,12 @@ class CPMMC(object):
         count = 0
         # predicted_label = np.sign(omega.transpose().dot(self.data.transpose()) + b)
         predicted_label = np.sign(data.dot(omega) + b).astype('int')
+        import ipdb
+        ipdb.set_trace()
 
         for i in range(bs):
             if predicted_label[i] == label[i]:
                 count += 1
 
-        return float(count) / bs, predicted_label
+        return count, predicted_label
 
